@@ -54,12 +54,12 @@ public class Main {
                     break;
                     
                 case 4:
-                    System.out.println("Operation not supported yet...");
-                    /*
-                    System.out.println("\nEnter a value to search: ");
+                    //System.out.println("Operation not supported yet...");
+                    
+                    System.out.println("Enter a value to search: ");
                     int searchingValue = scanner.nextInt();
-                    System.out.println("\nThe value \'" + searchingValue + "\' is in the Tree? : " + avlTree.search(searchingValue));
-                    */
+                    System.out.println("Is the value \'" + searchingValue + "\' in the Tree? : " + avlTree.search(searchingValue));
+                    
                     break;
                     
                 case 5:

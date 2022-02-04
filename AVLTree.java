@@ -118,7 +118,19 @@ class AVLTree {
     }
 
     private boolean search(Node node, int key) {
-    	return false;
+    	boolean found = false;
+    	while(node != null) {
+    		if(node.key < key) {
+    			node = node.right;
+    		} else if(node.key > key) {
+    			node = node.left;
+    		} else {
+    			found = true;
+    			break;
+    		}
+    		search(node, key);
+    	}
+    	return found;
     }
     
     public void printMytree() {
