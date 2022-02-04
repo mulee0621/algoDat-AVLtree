@@ -66,16 +66,16 @@ class AVLTree {
     }
 
     public void insert(int key) {
-        root = insertHelper(key, root);
+        root = insert(key, root);
     }
 
-    private Node insertHelper(int key, Node root) {
+    private Node insert(int key, Node root) {
         if (root == null) root = new Node(key);
         
         else if (key < root.key) {
         	
-        	root.left = insertHelper(key, root.left);
-            if (height(root.left) - height(root.right) > 1) {
+        	root.left = insert(key, root.left);
+            if (blanceFactor(root) > 1 || blanceFactor(root) < -1) {
                 if (key < root.left.key)
                 	//LL-Rotation
                 	root = rightRotation(root);
@@ -85,8 +85,8 @@ class AVLTree {
             }
         } else if (key > root.key) {
         	
-        	root.right = insertHelper(key, root.right);
-            if (height(root.right) - height(root.left) > 1) {
+        	root.right = insert(key, root.right);
+            if (blanceFactor(root) > 1 || blanceFactor(root) < -1) {
                 if (key > root.right.key)
                 	//RR-Rotation
                 	root = leftRotation(root);
@@ -101,8 +101,12 @@ class AVLTree {
     }
         
     private int maxHeight(int leftHeight, int rightHeight) {
-    	if(leftHeight > rightHeight) return leftHeight;
-    	else return rightHeight;
+    	return (leftHeight > rightHeight) ? leftHeight : rightHeight;
+    }
+    
+    private int blanceFactor(Node node) {
+    	if (node == null) return 0;
+    	return (height(node.left)-height(node.right));
     }
 
 	public void delete(int key) {
@@ -138,17 +142,16 @@ class AVLTree {
     }
     
     private int height(Node node) {
-    	if(node == null) return -1;
-    	else return node.height;
+    	return (node == null) ? 0 : node.height;
     }
     
     private String key(Node node) {
-        return node == null ? " " : Integer.toString(node.key);
+        return (node == null) ? " " : Integer.toString(node.key);
     }
  
     private void printMytree(Node Node) {
         if (Node != null) {
-        	System.out.print("\n"+key(Node.left)+" <- "+key(Node)+" -> "+key(Node.right));
+        	System.out.print("\n"+key(Node.left)+" <- "+key(Node)+" (BF:"+blanceFactor(Node)+")"+" -> "+key(Node.right));
         	printMytree(Node.left);
             printMytree(Node.right);
         }
