@@ -48,7 +48,7 @@ class AVLTree {
         node.left = oldRight;
 
         node.height = maxHeight(height(node.left), height(node.right)) + 1;
-        oldRight.height = maxHeight(height(oldLeft.left), node.height) + 1;
+        oldLeft.height = maxHeight(height(oldLeft.left), node.height) + 1;
         
         return oldLeft;
     } 
