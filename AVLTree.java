@@ -1,4 +1,4 @@
-package algoDat_avltree;
+//package algoDat_avltree;
 
 class AVLTree {
     private Node root;
@@ -106,11 +106,11 @@ class AVLTree {
     }
 
 	public void delete(int key) {
-		return delete(root, key);
+		delete(root, key);
 	}
 
 	private void delete(Node node, int key) {
-		//Todo
+		// To do
     }
 
 	public boolean search(int key) {
@@ -118,7 +118,7 @@ class AVLTree {
     }
 
     private boolean search(Node node, int key) {
-    	//Todo
+    	return false;
     }
     
     public void printMytree() {
