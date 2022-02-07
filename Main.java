@@ -9,7 +9,7 @@ public class Main {
        Scanner scanner = new Scanner(System.in);
        AVLTree avlTree = new AVLTree();
        
-       System.out.println("\n***** Options *****\n1: Insert single node \n2: Insert several nodes, seperated with ' ' or ',' \n3: Delete [WIP] \n4: Search \n5: Print \n6: Quit\n*******************");
+       System.out.println("\n***** Options *****\n1: Insert single node \n2: Insert several nodes, seperated with ' ' or ',' \n3: Delete \n4: Search \n5: Print \n6: Quit\n*******************");
        int choice;
        do {
             System.out.print("\noption: ");
@@ -46,11 +46,11 @@ public class Main {
                     break;
                     
                 case 3:
-                    System.out.println("Operation not supported yet...");
-                    /*
+                    //System.out.println("Operation not supported yet...");
+                    
                     System.out.println("\nEnter a value to delete: ");
                     avlTree.delete(scanner.nextInt());
-                    */
+                    System.out.println();
                     break;
                     
                 case 4:

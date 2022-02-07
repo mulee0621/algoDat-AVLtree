@@ -30,27 +30,31 @@ class AVLTree {
     }
     
     private Node leftRotation(Node node) {
-        Node oldRight = node.right;
-        Node oldLeft = oldRight.left;
-        oldRight.left = node;
-        node.right = oldLeft;
+        Node rightOfRoot = node.right;
+        Node leftOfrightOfRoot = rightOfRoot.left;
+        
+        Node newRoot = rightOfRoot;
+        newRoot.left = node;
+        node.right = leftOfrightOfRoot;
 
         node.height = maxHeight(height(node.left), height(node.right)) + 1;
-        oldRight.height = maxHeight(node.height, height(oldRight.right)) + 1;
+        newRoot.height = maxHeight(node.height, height(rightOfRoot.right)) + 1;
         
-        return oldRight;
+        return newRoot;
     }
 
     private Node rightRotation(Node node) {
-        Node oldLeft = node.left;
-        Node oldRight = oldLeft.right;
-        oldLeft.right = node;
-        node.left = oldRight;
+        Node leftOfRoot = node.left;
+        Node rightOfLeftOfRoot = leftOfRoot.right;
+        
+        Node newRoot = leftOfRoot;
+        newRoot.right = node;
+        node.left = rightOfLeftOfRoot;
 
         node.height = maxHeight(height(node.left), height(node.right)) + 1;
-        oldLeft.height = maxHeight(height(oldLeft.left), node.height) + 1;
+        newRoot.height = maxHeight(height(leftOfRoot.left), node.height) + 1;
         
-        return oldLeft;
+        return newRoot;
     } 
     
     private Node leftleftRotation(Node node) {
@@ -89,28 +93,28 @@ class AVLTree {
         else if (key < root.key) {
         	
         	root.left = insert(key, root.left);
-            if (blanceFactor(root) > 1 || blanceFactor(root) < -1) {
+            if (balanceFactor(root) > 1 || balanceFactor(root) < -1) {
                 if (key < root.left.key) {
                 	//LL-Rotation
-                	System.out.print(">> at " + root.key +"(BF:"+ blanceFactor(root) + ")");
+                	System.out.print(">> at " + root.key +"(BF:"+ balanceFactor(root) + ")");
                 	root = leftleftRotation(root);
                 } else {
                 	//LR-Rotation
-                	System.out.print(">> at " + root.key +"(BF:"+ blanceFactor(root) + ")");
+                	System.out.print(">> at " + root.key +"(BF:"+ balanceFactor(root) + ")");
                 	root = leftRightRotation(root); 
                 }
             }
         } else if (key > root.key) {
         	
         	root.right = insert(key, root.right);
-            if (blanceFactor(root) > 1 || blanceFactor(root) < -1) {
+            if (balanceFactor(root) > 1 || balanceFactor(root) < -1) {
                 if (key > root.right.key) {
                 	//RR-Rotation
-                	System.out.print(">> at " + root.key +"(BF:"+ blanceFactor(root) + ")");
+                	System.out.print(">> at " + root.key +"(BF:"+ balanceFactor(root) + ")");
                 	root = rightrightRotation(root);
                 } else {
                     //RL-Rotation
-                	System.out.print(">> at " + root.key +"(BF:"+ blanceFactor(root) + ")");
+                	System.out.print(">> at " + root.key +"(BF:"+ balanceFactor(root) + ")");
                 	root = rightLeftRotation(root);
                 }
             }
@@ -124,19 +128,81 @@ class AVLTree {
     	return (leftHeight > rightHeight) ? leftHeight : rightHeight;
     }
     
-    private int blanceFactor(Node node) {
+    private int balanceFactor(Node node) {
     	if (node == null) return 0;
     	return (height(node.right)-height(node.left));
     }
 
 	public void delete(int key) {
-		delete(root, key);
+		if (this.root != null && search(root, key) == true) {
+	    	this.root = delete(root, key);
+	    	System.out.println("After Delete node " + key);
+	    	printMytree();
+	    } else {
+	    	System.out.println("Node " + key + " is not found");
+	    }
 	}
 
-	private void delete(Node node, int key) {
-		//Kein Kind
-		//Ein Kind
-		//Zwei Kind
+	private Node delete(Node node, int key) {
+		if (node == null) return node;
+		
+        if (key < node.key)
+        	node.left = delete(node.left, key);
+        else if (key > node.key)
+        	node.right = delete(node.right, key);
+        else {
+        	// ohne Kind oder nur ein Kind
+        	if ((node.left == null) || (node.right == null)) {
+        		// speichern den zu löschenden Knoten
+                Node temp = null; 
+                
+                if (node.left != null) //mit linkes Kind
+                	temp = node.left; 
+                else if (node.right != null) //mit rechtes Kind
+                	temp = node.right; 
+                
+                if (temp == null) { //ohne Kind
+                    temp = node;
+                    node = null;
+                } else {
+                	node = temp;
+                }
+                temp = null;
+            } else { //mit zwei Kindern
+
+                Node temp = minKeyNode(node.right);
+                node.key = temp.key;
+                node.right = delete(node.right, temp.key);
+            }
+        } 
+        if (node == null) return node;
+        //Todo
+        node.height = maxHeight(height(node.left), height(node.right)) + 1;
+        
+        if (balanceFactor(node) > 1 && balanceFactor(node.left) >= 0) 
+        	return rightRotation(node);
+        
+        if (balanceFactor(node) > 1 && balanceFactor(node.left) < 0) {
+            node.left = leftRotation(node.left);
+            return rightRotation(node);
+        } 
+        
+        if (balanceFactor(node) < -1 && balanceFactor(node.right) <= 0)
+            return leftRotation(node);
+        
+        if (balanceFactor(node) < -1 && balanceFactor(node.right) > 0) {
+            node.right = rightRotation(node.right);
+            return leftRotation(node);
+        }
+        
+        return node;
+    }
+
+    public Node minKeyNode(Node node){
+    	while (node.left != null) {
+        	node = node.left;
+        }
+        return node;
     }
 
 	public boolean search(int key) {
@@ -173,7 +239,7 @@ class AVLTree {
  
     private void printMytree(Node Node) {
         if (Node != null) {
-        	System.out.print("\n"+key(Node.left)+" <- "+key(Node)+" (BF:"+blanceFactor(Node)+")"+" -> "+key(Node.right));
+        	System.out.print("\n"+key(Node.left)+" <- "+key(Node)+" (BF:"+balanceFactor(Node)+")"+" -> "+key(Node.right));
         	printMytree(Node.left);
             printMytree(Node.right);
         }
