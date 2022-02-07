@@ -53,13 +53,27 @@ class AVLTree {
         return oldLeft;
     } 
     
+    private Node leftleftRotation(Node node) {
+    	System.out.println(" LL-Imbalance");
+    	node = rightRotation(node);
+    	return node;
+    }
+    
+    private Node rightrightRotation(Node node) {
+    	System.out.println(" RR-Imbalance");
+    	node = leftRotation(node);
+    	return node;
+    }
+    
     private Node leftRightRotation(Node node) {
+    	System.out.println(" LR-Imbalance");
         node.left = leftRotation(node.left);
         node = rightRotation(node);
         return node;
     }
     
     private Node rightLeftRotation(Node node) {
+    	System.out.println(" RL-Imbalance");
     	node.right = rightRotation(node.right);
         node = leftRotation(node);
         return node;
@@ -76,23 +90,29 @@ class AVLTree {
         	
         	root.left = insert(key, root.left);
             if (blanceFactor(root) > 1 || blanceFactor(root) < -1) {
-                if (key < root.left.key)
+                if (key < root.left.key) {
                 	//LL-Rotation
-                	root = rightRotation(root);
-                else
+                	System.out.print(">> at " + root.key +"(BF:"+ blanceFactor(root) + ")");
+                	root = leftleftRotation(root);
+                } else {
                 	//LR-Rotation
+                	System.out.print(">> at " + root.key +"(BF:"+ blanceFactor(root) + ")");
                 	root = leftRightRotation(root); 
+                }
             }
         } else if (key > root.key) {
         	
         	root.right = insert(key, root.right);
             if (blanceFactor(root) > 1 || blanceFactor(root) < -1) {
-                if (key > root.right.key)
+                if (key > root.right.key) {
                 	//RR-Rotation
-                	root = leftRotation(root);
-                else
-                	//RL-Rotation
+                	System.out.print(">> at " + root.key +"(BF:"+ blanceFactor(root) + ")");
+                	root = rightrightRotation(root);
+                } else {
+                    //RL-Rotation
+                	System.out.print(">> at " + root.key +"(BF:"+ blanceFactor(root) + ")");
                 	root = rightLeftRotation(root);
+                }
             }
         }
         
@@ -106,7 +126,7 @@ class AVLTree {
     
     private int blanceFactor(Node node) {
     	if (node == null) return 0;
-    	return (height(node.left)-height(node.right));
+    	return (height(node.right)-height(node.left));
     }
 
 	public void delete(int key) {
@@ -114,7 +134,9 @@ class AVLTree {
 	}
 
 	private void delete(Node node, int key) {
-		// To do
+		//Kein Kind
+		//Ein Kind
+		//Zwei Kind
     }
 
 	public boolean search(int key) {
