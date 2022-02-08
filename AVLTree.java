@@ -43,7 +43,7 @@ class AVLTree {
     
     private Node rightRotation(Node node) {
         Node leftOfRoot = node.left;
-        
+    
         node.left  = leftOfRoot.right;
         leftOfRoot.right = node;
 
