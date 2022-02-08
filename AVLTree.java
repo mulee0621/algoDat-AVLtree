@@ -31,97 +31,91 @@ class AVLTree {
     
     private Node leftRotation(Node node) {
         Node rightOfRoot = node.right;
-        Node leftOfrightOfRoot = rightOfRoot.left;
         
-        Node newRoot = rightOfRoot;
-        newRoot.left = node;
-        node.right = leftOfrightOfRoot;
-
-        node.height = maxHeight(height(node.left), height(node.right)) + 1;
-        newRoot.height = maxHeight(node.height, height(rightOfRoot.right)) + 1;
+        node.right = rightOfRoot.left;
+        rightOfRoot.left = node;
         
-        return newRoot;
+        node.height = maxHeight(height(node.left),  height(node.right)) + 1;
+        rightOfRoot.height = maxHeight(height(rightOfRoot.left),  height(rightOfRoot.right)) + 1;
+        
+        return rightOfRoot;
     }
-
+    
     private Node rightRotation(Node node) {
         Node leftOfRoot = node.left;
-        Node rightOfLeftOfRoot = leftOfRoot.right;
         
-        Node newRoot = leftOfRoot;
-        newRoot.right = node;
-        node.left = rightOfLeftOfRoot;
+        node.left  = leftOfRoot.right;
+        leftOfRoot.right = node;
 
-        node.height = maxHeight(height(node.left), height(node.right)) + 1;
-        newRoot.height = maxHeight(height(leftOfRoot.left), node.height) + 1;
+        node.height = maxHeight(height(node.left),  height(node.right)) + 1;
+        leftOfRoot.height = maxHeight(height(leftOfRoot.left),  height(leftOfRoot.right)) + 1;
         
-        return newRoot;
+        return leftOfRoot;
     } 
     
     private Node leftleftRotation(Node node) {
-    	System.out.println(" LL-Imbalance");
+    	System.out.println(">> LL-Imbalance >> at " + node.key +"(BF:"+ balanceFactor(node) + ")");
     	node = rightRotation(node);
     	return node;
     }
     
     private Node rightrightRotation(Node node) {
-    	System.out.println(" RR-Imbalance");
+    	System.out.println(">> RR-Imbalance >> at " + node.key +"(BF:"+ balanceFactor(node) + ")");
     	node = leftRotation(node);
     	return node;
     }
     
     private Node leftRightRotation(Node node) {
-    	System.out.println(" LR-Imbalance");
+    	System.out.println(">> LR-Imbalance >> at " + node.key +"(BF:"+ balanceFactor(node) + ")");
         node.left = leftRotation(node.left);
         node = rightRotation(node);
         return node;
     }
     
     private Node rightLeftRotation(Node node) {
-    	System.out.println(" RL-Imbalance");
+    	System.out.println(">> RL-Imbalance >> at " + node.key +"(BF:"+ balanceFactor(node) + ")");
     	node.right = rightRotation(node.right);
         node = leftRotation(node);
         return node;
+    }
+    
+    private Node rebalance(Node node) {
+    	  // Left-heavy
+    	  if (balanceFactor(node) < -1)
+    	    if (balanceFactor(node.left) <= 0)
+    	    	//LL-Rotation
+    	    	node = leftleftRotation(node);
+    	    else                   
+    	    	//LR-Rotation
+    	    	node = leftRightRotation(node);
+
+    	  // Right-heavy
+    	  if (balanceFactor(node) > 1)
+    	    if (balanceFactor(node.right) >= 0)
+    	    	//RR-Rotation
+    	    	node = rightrightRotation(node);
+    	    else                          
+    	    	//RL-Rotation
+    	    	node = rightLeftRotation(node);
+    	  return node;
     }
 
     public void insert(int key) {
         root = insert(key, root);
     }
-
-    private Node insert(int key, Node root) {
-        if (root == null) root = new Node(key);
+    
+    private Node insert(int key, Node node) {
+    	if (node == null) node = new Node(key);
         
-        else if (key < root.key) {
-        	
-        	root.left = insert(key, root.left);
-            if (balanceFactor(root) > 1 || balanceFactor(root) < -1) {
-                if (key < root.left.key) {
-                	//LL-Rotation
-                	System.out.print(">> at " + root.key +"(BF:"+ balanceFactor(root) + ")");
-                	root = leftleftRotation(root);
-                } else {
-                	//LR-Rotation
-                	System.out.print(">> at " + root.key +"(BF:"+ balanceFactor(root) + ")");
-                	root = leftRightRotation(root); 
-                }
-            }
-        } else if (key > root.key) {
-        	
-        	root.right = insert(key, root.right);
-            if (balanceFactor(root) > 1 || balanceFactor(root) < -1) {
-                if (key > root.right.key) {
-                	//RR-Rotation
-                	System.out.print(">> at " + root.key +"(BF:"+ balanceFactor(root) + ")");
-                	root = rightrightRotation(root);
-                } else {
-                    //RL-Rotation
-                	System.out.print(">> at " + root.key +"(BF:"+ balanceFactor(root) + ")");
-                	root = rightLeftRotation(root);
-                }
-            }
+        else if (key < node.key) {
+        	node.left = insert(key, node.left);
+        } else if (key > node.key) {
+        	node.right = insert(key, node.right);
         }
-        
-        root.height = maxHeight(height(root.left), height(root.right)) + 1;
-        return root;
+    	node.height = maxHeight(height(node.left),  height(node.right)) + 1;
+    	node = rebalance(node);
+    	
+    	return node;
     }
         
     private int maxHeight(int leftHeight, int rightHeight) {
@@ -136,67 +130,44 @@ class AVLTree {
 	public void delete(int key) {
 		if (this.root != null && search(root, key) == true) {
 	    	this.root = delete(root, key);
-	    	System.out.println("After Delete node " + key);
 	    	printMytree();
 	    } else {
 	    	System.out.println("Node " + key + " is not found");
 	    }
 	}
-
+	
 	private Node delete(Node node, int key) {
+	    if (node == null) return node;
+
+	    if (key < node.key) 
+	    	node.left = delete(node.left, key);
+	    else if (key > node.key)
+	    	node.right = delete(node.right, key);
+
+	    // no children
+	    else if (node.left == null && node.right == null)
+	    	node = null;
+
+	    // one child
+	    else if (node.left == null)
+	    	node = node.right;
+	    else if (node.right == null)
+	    	node = node.left;
+
+	    // two children
+	    else {    	
+            Node temp = minKeyNode(node.right);
+            node.key = temp.key;
+            node.right = delete(node.right, temp.key);
+	    }
+
 		if (node == null) return node;
 		
-        if (key < node.key)
-        	node.left = delete(node.left, key);
-        else if (key > node.key)
-        	node.right = delete(node.right, key);
-        else {
-        	// ohne Kind oder nur ein Kind
-        	if ((node.left == null) || (node.right == null)) {
-        		// speichern den zu löschenden Knoten
-                Node temp = null; 
-                
-                if (node.left != null) //mit linkes Kind
-                	temp = node.left; 
-                else if (node.right != null) //mit rechtes Kind
-                	temp = node.right; 
-                
-                if (temp == null) { //ohne Kind
-                    temp = node;
-                    node = null;
-                } else {
-                	node = temp;
-                }
-                temp = null;
-            } else { //mit zwei Kindern
-
-                Node temp = minKeyNode(node.right);
-                node.key = temp.key;
-                node.right = delete(node.right, temp.key);
-            }
-        } 
-        if (node == null) return node;
-        //Todo
-        node.height = maxHeight(height(node.left), height(node.right)) + 1;
-        
-        if (balanceFactor(node) > 1 && balanceFactor(node.left) >= 0) 
-        	return rightRotation(node);
-        
-        if (balanceFactor(node) > 1 && balanceFactor(node.left) < 0) {
-            node.left = leftRotation(node.left);
-            return rightRotation(node);
-        } 
-        
-        if (balanceFactor(node) < -1 && balanceFactor(node.right) <= 0)
-            return leftRotation(node);
-        
-        if (balanceFactor(node) < -1 && balanceFactor(node.right) > 0) {
-            node.right = rightRotation(node.right);
-            return leftRotation(node);
-        }
-        
-        return node;
-    }
+		node.height = maxHeight(height(node.left),  height(node.right)) + 1;
+		node = rebalance(node);
+		
+		return node;
+	}
 
     public Node minKeyNode(Node node){
     	while (node.left != null) {
@@ -230,9 +201,9 @@ class AVLTree {
     }
     
     private int height(Node node) {
-    	return (node == null) ? 0 : node.height;
+    	return (node == null) ? -1 : node.height;
     }
-    
+     
     private String key(Node node) {
         return (node == null) ? " " : Integer.toString(node.key);
     }
